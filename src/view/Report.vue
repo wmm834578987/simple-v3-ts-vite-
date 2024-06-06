@@ -1,11 +1,17 @@
 <template>
   <div id="index">
-    <el-button type="primary" @click="exportImg">导出</el-button>
+    <div class="back _primary" @click="back">
+      <el-icon><Back /></el-icon>
+    </div>
+    <el-button type="primary" class="export-btn" @click="exportImg">导出所有图片</el-button>
     <div class="table-part" :id="`part${item + 1}`" v-for="item in getPages()" :key="item">
       <div class="profile-box">
         <img src="../assets/img/sun.png" class="profile" alt="" />
         <img class="decoration" src="../assets/img/decoration.png" />
-        <el-input class="name-input" v-model="username"></el-input>
+        <div class="name-input">
+          <div class="name-input-item"><span>姓名</span> {{ route.query.name }}</div>
+          <div class="name-input-item"><span>幼儿园</span> {{ route.query.kindergarten }}</div>
+        </div>
       </div>
       <div class="name"></div>
       <CommonTable
@@ -15,11 +21,32 @@
       ></CommonTable>
     </div>
     <div id="part1">
+      <div class="title-common">
+        <img src="../assets/img/ability.png" alt="" srcset="" />
+      </div>
       <div id="charts"></div>
-      <div class="avatar"></div>
-      <el-input class="advice username" resize="none" v-model="username"></el-input>
-      <el-input type="textarea" class="advice" resize="none" v-model="advice"></el-input>
-      <el-input type="textarea" class="advice comment" resize="none" v-model="comment"></el-input>
+      <div class="profile-box avatar">
+        <img src="../assets/img/sun.png" class="profile" alt="" />
+        <img class="decoration" src="../assets/img/decoration.png" />
+        <div class="name-input">
+          <div class="name-input-item"><span>姓名</span> {{ route.query.name }}</div>
+          <div class="name-input-item"><span>幼儿园</span> {{ route.query.kindergarten }}</div>
+        </div>
+      </div>
+      <div class="title-common child2">
+        <img src="../assets/img/advice.png" alt="" srcset="" />
+      </div>
+      <el-input type="textarea" class="advice" resize="none" disabled v-model="advice"></el-input>
+      <div class="title-common child3">
+        <img src="../assets/img/comment.png" alt="" srcset="" />
+      </div>
+      <el-input
+        type="textarea"
+        class="advice comment"
+        resize="none"
+        disabled
+        v-model="comment"
+      ></el-input>
     </div>
   </div>
 </template>
@@ -30,11 +57,11 @@ import { onMounted, ref } from 'vue';
 import { toPng } from 'html-to-image';
 import { downloadImage } from '../assets/js/common';
 import CommonTable from '../components/CommonTable.vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 const route = useRoute();
+const router = useRouter();
 const advice = ref<string>('');
 const comment = ref<string>('');
-const username = ref<string>('小朋友');
 const total = ref<number>(14);
 onMounted(() => {
   console.log(route.query);
@@ -107,6 +134,9 @@ const exportImg = async () => {
     );
   }
 };
+const back = () => {
+  router.push('/');
+};
 </script>
 
 <style lang="less" scoped>
@@ -135,15 +165,23 @@ const exportImg = async () => {
       left: 50%;
       transform: translate(-50%, -50%);
     }
-
-    .avatar {
-      width: 102px;
-      height: 102px;
-      border-radius: 50%;
+    .title-common {
       position: absolute;
-      left: 56px;
-      top: 78px;
-      background-color: #fff;
+      left: 70px;
+      top: 200px;
+      img {
+        height: 30px;
+      }
+    }
+    .child2 {
+      top: 570px;
+    }
+    .child3 {
+      top: 760px;
+    }
+    .avatar {
+      left: 9%;
+      top: 8%;
     }
 
     .advice {
@@ -156,8 +194,9 @@ const exportImg = async () => {
       :deep(.el-textarea__inner) {
         height: 120px;
         font-size: 24px;
-        border: none;
         box-shadow: none;
+        border: 3px solid #f0c03d;
+        background-color: #fff;
       }
     }
     .comment {
@@ -165,24 +204,66 @@ const exportImg = async () => {
       :deep(.el-textarea__inner) {
         height: 210px;
         font-size: 24px;
-        border: none;
         box-shadow: none;
+        border: 3px solid #f0c03d;
       }
     }
     .username {
       top: 113px;
-      width: 59%;
-      left: 59%;
-
+      width: 70%;
+      left: 52%;
       :deep(.el-input__wrapper) {
-        height: 45px;
+        height: 60px;
         font-size: 24px;
         border: none;
         box-shadow: none;
+        background: #f9f3d3;
+        border-radius: 10px;
+        padding-left: 50px;
       }
     }
   }
-
+  .profile-box {
+    position: relative;
+    z-index: 5;
+    left: 10px;
+    .profile {
+      position: absolute;
+      z-index: 9;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: yellow;
+    }
+    .decoration {
+      position: absolute;
+      z-index: 10;
+    }
+    .name-input {
+      position: absolute;
+      width: 500px;
+      margin: 0 auto;
+      position: absolute;
+      z-index: 4;
+      left: 10%;
+      top: 24px;
+      height: 60px;
+      font-size: 22px;
+      line-height: 60px;
+      background: #f9f3d3;
+      border-radius: 10px;
+      padding-left: 50px;
+      display: flex;
+      .name-input-item {
+        margin-right: 40px;
+        span {
+          font-size: 20px;
+          color: #bbb;
+          margin-right: 10px;
+        }
+      }
+    }
+  }
   .table-part {
     width: 770px;
     height: 1080px;
@@ -193,46 +274,24 @@ const exportImg = async () => {
     padding-top: 5.5%;
     padding-left: 55px;
     box-sizing: border-box;
-    .profile-box {
-      position: relative;
-      z-index: 5;
-      left: 10px;
-      .profile {
-        position: absolute;
-        z-index: 9;
-        width: 100px;
-        height: 100px;
-        border-radius: 50%;
-        background: yellow;
-      }
-      .decoration {
-        position: absolute;
-        z-index: 10;
-      }
-      .name-input {
-        position: absolute;
-        width: 500px;
-        margin: 0 auto;
-        position: absolute;
-        z-index: 4;
-        left: 10%;
-        top: 24px;
-        :deep(.el-input__wrapper) {
-          height: 60px;
-          font-size: 24px;
-          border: none;
-          box-shadow: none;
-          background: #f9f3d3;
-          border-radius: 10px;
-          padding-left: 50px;
-        }
-      }
-    }
   }
 
   .table {
     width: 92%;
     margin-top: 15%;
   }
+}
+.export-btn {
+  position: fixed;
+  right: 20%;
+  top: 20px;
+}
+
+.back {
+  position: fixed;
+  top: 20px;
+  left: 20%;
+  font-size: 30px;
+  cursor: pointer;
 }
 </style>

@@ -14,8 +14,9 @@
 
       <el-form-item label="是否批改">
         <el-select v-model="form.correct" placeholder="请选择是否批改">
-          <el-option label="是" value="1" />
-          <el-option label="否" value="0" />
+          <el-option label="全部" value="all" />
+          <el-option label="已批改" value="1" />
+          <el-option label="未批改" value="0" />
         </el-select>
       </el-form-item>
       <el-form-item label="姓名">
@@ -28,7 +29,7 @@
 
     <el-table :data="tableData" border style="width: 100%">
       <el-table-column prop="index" label="序号" width="100" />
-      <el-table-column prop="kindergarten" label="幼儿园" width="200" />
+      <el-table-column prop="kindergarten" label="幼儿园" width="300" />
       <el-table-column prop="name" label="姓名" width="150" />
       <el-table-column prop="avatar" label="头像" width="200">
         <template #default="{ row }">
@@ -39,6 +40,7 @@
             action="#"
             :on-change="fileChange"
             :auto-upload="false"
+            accept=".png,.jpg"
           >
             <img
               class="avatar"
@@ -62,7 +64,9 @@
       </el-table-column>
       <el-table-column prop="correct" label="批改成绩">
         <template #default="{ row }">
-          <el-button type="primary" @click="correct(row)">批改</el-button>
+          <el-button :type="row.has ? 'danger' : 'primary'" @click="correct(row)">
+            {{ row.has ? '已批改' : '批改' }}
+          </el-button>
         </template>
       </el-table-column>
       <el-table-column prop="preview" label="预览与导出">
@@ -108,21 +112,24 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { type UploadProps, type UploadUserFile, type UploadRawFile } from 'element-plus';
+import type { UploadProps, UploadUserFile, UploadRawFile, UploadFile } from 'element-plus';
+import { ElMessage } from 'element-plus';
 import VuePictureCropper, { cropper } from 'vue-picture-cropper';
-import { getImageUrl } from '../assets/js/common';
+import { getImageUrl, getFileExtension } from '../assets/js/common';
 import { LocationQueryRaw, useRouter } from 'vue-router';
 interface TableColumn {
   kindergarten: string;
   name: string;
   avatar: string;
   index?: number;
+  has: string | number | boolean;
 }
 const router = useRouter();
 const fileList = ref<UploadUserFile[]>([]);
 const currentFile = ref<UploadUserFile>();
 const dialogVisible = ref<boolean>(false);
 const kindergartenList = ref([
+  { key: '全部', value: 'all' },
   { key: '学田', value: '1' },
   { key: '学士府', value: '2' },
   { key: '龚路', value: '3' },
@@ -138,17 +145,25 @@ const row = ref<TableColumn>({
   kindergarten: '',
   name: '',
   avatar: '',
+  has: false,
 });
 const form = ref({
-  kindergarten: '1',
+  kindergarten: 'all',
   name: '',
-  correct: '1',
+  correct: 'all',
 });
 
 const defaultImg = ref<string>(getImageUrl('transparent.png'));
 const updatedImg = ref<string>('');
 
-const fileChange: UploadProps['onChange'] = (file) => {
+const fileChange: UploadProps['onChange'] = (file: UploadFile) => {
+  const { size, name } = file;
+  if (size && size > 3 * 1024 * 1024) {
+    return ElMessage.error('图片不能超过3M');
+  }
+  if (getFileExtension(name) !== 'png' && getFileExtension(name) !== 'jpg') {
+    return ElMessage.error('图片格式不正确，请上传PNG或者JPG格式图片');
+  }
   currentFile.value = file;
   const reader = new FileReader();
   reader.onload = (e) => {
@@ -189,14 +204,15 @@ const onSubmit = () => {
 const getTableData = async () => {
   tableData.value = [];
   let param = { ...form.value, pageNum: pageNum.value, pageSize: pageSize.value };
+  console.log(param);
   for (let index = 0; index < 10; index++) {
     let obj = {
       kindergarten: '学田幼儿园',
       name: 'ber ber',
       avatar: '',
       index: (pageNum.value - 1) * pageSize.value + index + 1,
+      has: index % 2 == 0,
     };
-    console.log(obj, '===>obj');
     tableData.value.push(obj);
   }
   total.value = 134;

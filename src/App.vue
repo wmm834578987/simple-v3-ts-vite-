@@ -8,7 +8,6 @@
   height: 100vh;
   overflow: auto;
   overflow-x: hidden;
-  font-family: 'pingfang';
   background: #ddd;
 }
 </style>

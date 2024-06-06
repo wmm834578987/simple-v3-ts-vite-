@@ -11,3 +11,7 @@ import { get, post } from "./http";
 export default {
     getPicTags: (param: queryParam) => get("getPicTags", param),
 }
+
+
+
+

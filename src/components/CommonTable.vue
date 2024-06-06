@@ -73,6 +73,8 @@ const getRate = (r: number, type: string): string[] => {
     border-right: 1px solid #fff;
     display: flex;
     flex-wrap: wrap;
+    padding: 3px;
+    box-sizing: border-box;
     flex: 1;
     justify-content: center;
     align-items: center;

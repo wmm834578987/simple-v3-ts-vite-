@@ -41,4 +41,7 @@ export function downloadImage(url: string, fileName: string) {
       document.body.removeChild(a);
     });
 }
-
+export function getFileExtension(filename: string): string {
+  const match = filename.match(/\.([^\.]+)$/);
+  return match ? match[1] : '';
+}

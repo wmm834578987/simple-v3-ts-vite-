@@ -1,7 +1,9 @@
 <template>
   <div id="correct">
     <header>
-      <div class="back _primary" @click="back">返回</div>
+      <div class="back _primary" @click="back">
+        <el-icon><Back /></el-icon>
+      </div>
       <div class="kindergarten relative">{{ route.query.kindergarten }}</div>
       <div class="name relative">{{ route.query.name }}</div>
       <el-button class="add-btn absolute" type="primary">新增讲次</el-button>
@@ -62,12 +64,12 @@ onMounted(() => {
 });
 
 const back = async () => {
-  const res = await ElMessageBox.confirm('有未保存的数据，是否确认返回？', '提示', {
-    confirmButtonText: '确认',
-    cancelButtonText: '取消',
-    type: 'warning',
-  });
-  if (!res) return;
+  // const res = await ElMessageBox.confirm('有未保存的数据，是否确认返回？', '提示', {
+  //   confirmButtonText: '确认',
+  //   cancelButtonText: '取消',
+  //   type: 'warning',
+  // });
+  // if (!res) return;
   router.push('/');
 };
 
@@ -82,7 +84,8 @@ const getTableData = () => {
   }
 };
 const del = async (val: TableDataCloumn) => {
-  const res = await ElMessageBox.confirm('将要删除此课件，请确认是否删除？', '删除', {
+  console.log(val, '===>val');
+  const res = await ElMessageBox.confirm('是否删除？ 删除后不可恢复，请谨慎操作！', '是否删除', {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
     type: 'warning',
