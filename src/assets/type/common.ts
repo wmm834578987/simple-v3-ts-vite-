@@ -18,3 +18,24 @@ export interface Result<T = any> {
 export interface queryParam {
     id: string | number
 }
+
+export interface TableColumn {
+    kindergarten: string;
+    name: string;
+    avatar: string;
+    index?: number;
+    has: string | number | boolean;
+}
+
+export interface TableDataCloumn {
+    lecture: string;
+    homework: string | number;
+    manifestation: string | number;
+    ability: string | number;
+}
+
+export enum MARK {
+    homework = 'homework',
+    manifestation = 'manifestation',
+    ability = 'ability',
+}

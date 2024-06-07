@@ -117,13 +117,7 @@ import { ElMessage } from 'element-plus';
 import VuePictureCropper, { cropper } from 'vue-picture-cropper';
 import { getImageUrl, getFileExtension } from '../assets/js/common';
 import { LocationQueryRaw, useRouter } from 'vue-router';
-interface TableColumn {
-  kindergarten: string;
-  name: string;
-  avatar: string;
-  index?: number;
-  has: string | number | boolean;
-}
+import { TableColumn } from '../assets/type/common';
 const router = useRouter();
 const fileList = ref<UploadUserFile[]>([]);
 const currentFile = ref<UploadUserFile>();

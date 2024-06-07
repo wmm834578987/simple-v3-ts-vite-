@@ -57,7 +57,7 @@ request.interceptors.response.use(
 export function get(url: string, params: any) {
     return new Promise((resolve, reject) => {
         request.get(url, { params: params }).then((res: AxiosResponse<Result>) => {
-            resolve(res.data as unknown)
+            resolve(res.data as Result)
         }).catch(err => {
             reject(err)
         })
@@ -68,9 +68,10 @@ export function get(url: string, params: any) {
 export function post(url: string, params: any, config: any = { "Content-Type": "application/json;charset=utf-8" }) {
     return new Promise((resolve, reject) => {
         request.post(url, params, config).then((res: AxiosResponse<Result>) => {
-            resolve(res.data as unknown)
+            resolve(res.data as Result)
         }).catch(err => {
             reject(err)
         })
     })
 }
+

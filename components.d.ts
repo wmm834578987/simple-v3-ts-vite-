@@ -8,6 +8,9 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     CommonTable: typeof import('./src/components/CommonTable.vue')['default']
+    Confirm: typeof import('./src/components/Confirm.vue')['default']
+    Index: typeof import('./src/components/confirm/Index.vue')['default']
+    QuickMark: typeof import('./src/components/QuickMark.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

@@ -38,10 +38,11 @@ const tbList = ref<TbList[]>([]);
 for (let i = 0; i < props.count; i++) {
   tbList.value.push({
     index: (props.index - 1) * 7 + i + 1,
-    context: '知识点：有序观察、找不同111111111111111111111111111111 \n易错点：观察不按顺序',
-    rate1: Math.ceil(Math.random() * 6),
-    rate2: Math.ceil(Math.random() * 6),
-    rate3: Math.ceil(Math.random() * 6),
+    context:
+      '知识点：量时头对齐，再看数，遇到断尺数格子使用格子尺测量物品 \n易错点：相近干扰选项需满足多个条件时，只考虑一个角度',
+    rate1: Math.floor(Math.random() * 7),
+    rate2: Math.floor(Math.random() * 7),
+    rate3: Math.floor(Math.random() * 7),
   });
 }
 const getRate = (r: number, type: string): string[] => {
@@ -78,8 +79,12 @@ const getRate = (r: number, type: string): string[] => {
     flex: 1;
     justify-content: center;
     align-items: center;
+    align-content: center;
+    &:nth-child(1) {
+      flex: 0.5;
+    }
     &:nth-child(2) {
-      flex: 2;
+      flex: 2.5;
     }
   }
   .tb {
@@ -98,12 +103,13 @@ const getRate = (r: number, type: string): string[] => {
 img {
   width: 30px;
   height: 30px;
+  margin: 3px 0;
 }
 .context {
   line-height: 25px;
   text-align: left;
   white-space: pre-line;
   word-break: break-all;
-  font-size: 16px;
+  font-size: 14px;
 }
 </style>

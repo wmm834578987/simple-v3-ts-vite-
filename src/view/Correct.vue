@@ -6,23 +6,29 @@
       </div>
       <div class="kindergarten relative">{{ route.query.kindergarten }}</div>
       <div class="name relative">{{ route.query.name }}</div>
-      <el-button class="add-btn absolute" type="primary">新增讲次</el-button>
+      <div class="add-btn absolute">
+        <el-button type="success" @click="doQuickMark">快速打分</el-button>
+        <el-button type="primary">新增讲次</el-button>
+      </div>
     </header>
     <el-table :data="tableData" border style="width: 100%">
       <el-table-column prop="lecture" label="讲次" width="200" />
       <el-table-column prop="homework" label="作业完成">
         <template #default="{ row }">
-          <el-input-number v-model="row.homework" :min="0" :max="6" />
+          <!-- <el-input-number v-model="row.homework" :min="0" :max="6" /> -->
+          <el-rate v-model="row.homework" :max="6" :colors="colors" />
         </template>
       </el-table-column>
       <el-table-column prop="manifestation" label="平时表现">
         <template #default="{ row }">
-          <el-input-number v-model="row.manifestation" :min="0" :max="6" />
+          <!-- <el-input-number v-model="row.manifestation" :min="0" :max="6" /> -->
+          <el-rate v-model="row.manifestation" :max="6" :colors="colors" />
         </template>
       </el-table-column>
       <el-table-column prop="ability" label="能力检测">
         <template #default="{ row }">
-          <el-input-number v-model="row.ability" :min="0" :max="6" />
+          <!-- <el-input-number v-model="row.ability" :min="0" :max="6" /> -->
+          <el-rate v-model="row.ability" :max="6" :colors="colors" />
         </template>
       </el-table-column>
       <el-table-column label="删除讲次">
@@ -42,23 +48,25 @@
     ></el-input>
     <el-button class="confirm-btn" type="primary" @click="confirm">确认修改</el-button>
   </div>
+  <Confirm ref="confirmRef" @confirm="doSubmit"></Confirm>
+  <QuickMark ref="quickMarkRef" @formatMark="formatMark" :tableData="tableData"></QuickMark>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import Confirm from '../components/Confirm.vue';
+import QuickMark from '../components/QuickMark.vue';
+import type { TableDataCloumn } from '../assets/type/common';
 const route = useRoute();
 const router = useRouter();
-interface TableDataCloumn {
-  lecture: string;
-  homework: string | number;
-  manifestation: string | number;
-  ability: string | number;
-}
+
 const tableData = ref<TableDataCloumn[]>([]);
 const comment = ref<string>('');
-
+const colors = ref<string[]>(['#f56c56', '#409eff', '#FF9900']);
+const confirmRef = ref<InstanceType<typeof Confirm> | null>(null);
+const quickMarkRef = ref<InstanceType<typeof QuickMark> | null>(null);
 onMounted(() => {
   getTableData();
 });
@@ -70,6 +78,7 @@ const back = async () => {
   //   type: 'warning',
   // });
   // if (!res) return;
+
   router.push('/');
 };
 
@@ -85,7 +94,7 @@ const getTableData = () => {
 };
 const del = async (val: TableDataCloumn) => {
   console.log(val, '===>val');
-  const res = await ElMessageBox.confirm('是否删除？ 删除后不可恢复，请谨慎操作！', '是否删除', {
+  const res = await ElMessageBox.confirm('删除后不可恢复，请谨慎操作！', '是否删除', {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
     type: 'warning',
@@ -95,8 +104,33 @@ const del = async (val: TableDataCloumn) => {
   // const data =await
   getTableData();
 };
+const confirm = async () => {
+  let flag = false;
+  let neverShow = localStorage.getItem('neverShow') === 'true' ? true : false;
+  for (let i = 0; i < tableData.value.length; i++) {
+    let el = tableData.value[i];
+    if (el.ability === 0 || el.homework === 0 || el.manifestation === 0) {
+      flag = true;
+      break;
+    }
+  }
+  if (flag && !neverShow) {
+    confirmRef.value?.show();
+    return;
+  }
+  doSubmit();
+};
+const doSubmit = () => {
+  console.log('submit is invoke');
+  router.push('/');
+};
+const doQuickMark = () => {
+  quickMarkRef.value?.show();
+};
 
-const confirm = () => {};
+const formatMark = (val: TableDataCloumn[]) => {
+  tableData.value = val;
+};
 </script>
 
 <style lang="less" scoped>

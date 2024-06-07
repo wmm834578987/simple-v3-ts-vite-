@@ -19,6 +19,7 @@
   user-select: none;
   /* 不允许用户拖动图片 */
   -webkit-user-drag: none;
+  font-family: 'pingfang';
 }
 /* a标签默认颜色(自行更改) */
 a {
