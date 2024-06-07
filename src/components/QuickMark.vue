@@ -46,11 +46,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineEmits, defineExpose, defineProps } from 'vue';
 import { TableDataCloumn, MARK } from '../assets/type/common';
 const props = defineProps(['tableData']);
 const emits = defineEmits();
-
 const data = ref<TableDataCloumn[]>([]);
 
 const form = ref<TableDataCloumn>({

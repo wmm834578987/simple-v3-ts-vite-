@@ -111,7 +111,6 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
 import type { UploadProps, UploadUserFile, UploadRawFile, UploadFile } from 'element-plus';
 import { ElMessage } from 'element-plus';
 import VuePictureCropper, { cropper } from 'vue-picture-cropper';

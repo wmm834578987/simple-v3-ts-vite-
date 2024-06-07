@@ -22,7 +22,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps } from 'vue';
 import { getImageUrl } from '../assets/js/common';
 const props = defineProps(['index', 'count']);
 console.log(props);

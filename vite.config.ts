@@ -11,11 +11,13 @@ import vue from '@vitejs/plugin-vue'
 import Components from "unplugin-vue-components/vite"; // 按需组件自动导入
 import { AntDesignVueResolver } from "unplugin-vue-components/resolvers";
 import postcsspxtoviewport from "postcss-px-to-viewport"
+import AutoImport from 'unplugin-auto-import/vite'
 // https://vitejs.dev/config/
 
 
 // https://vitejs.dev/config/
 export default defineConfig({
+
   css: {
     postcss: {
       plugins: [
@@ -56,7 +58,28 @@ export default defineConfig({
       }),
     ],
     include: [/\.vue$/, /\.vue\?vue/, /\.md$/, /\.tsx$/], //包含的文件类型
-  })],
+  }),
+  AutoImport({
+    // targets to transform
+    include: [
+      /\.[tj]sx?$/,
+      /\.vue$/,
+      /\.vue\?vue/,
+      /\.md$/,
+    ],
+    imports: [
+      'vue',
+      'vue-router',
+      'pinia'
+    ],
+    eslintrc: {
+      enabled: false, // Default `false`
+      filepath: './.eslintrc-auto-import.json', // Default `./.eslintrc-auto-import.json`
+      globalsPropValue: true, // Default `true`, (true | false | 'readonly' | 'readable' | 'writable' | 'writeable')
+    },
+    dts: './auto-imports.d.ts',
+  })
+  ],
 
   server: {
     port: 9000,

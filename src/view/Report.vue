@@ -53,7 +53,6 @@
 
 <script setup lang="ts">
 import * as echarts from 'echarts';
-import { onMounted, ref } from 'vue';
 import { toPng } from 'html-to-image';
 import { downloadImage } from '../assets/js/common';
 import CommonTable from '../components/CommonTable.vue';

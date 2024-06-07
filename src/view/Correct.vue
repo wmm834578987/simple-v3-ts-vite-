@@ -15,19 +15,16 @@
       <el-table-column prop="lecture" label="讲次" width="200" />
       <el-table-column prop="homework" label="作业完成">
         <template #default="{ row }">
-          <!-- <el-input-number v-model="row.homework" :min="0" :max="6" /> -->
           <el-rate v-model="row.homework" :max="6" :colors="colors" />
         </template>
       </el-table-column>
       <el-table-column prop="manifestation" label="平时表现">
         <template #default="{ row }">
-          <!-- <el-input-number v-model="row.manifestation" :min="0" :max="6" /> -->
           <el-rate v-model="row.manifestation" :max="6" :colors="colors" />
         </template>
       </el-table-column>
       <el-table-column prop="ability" label="能力检测">
         <template #default="{ row }">
-          <!-- <el-input-number v-model="row.ability" :min="0" :max="6" /> -->
           <el-rate v-model="row.ability" :max="6" :colors="colors" />
         </template>
       </el-table-column>
@@ -53,8 +50,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import Confirm from '../components/Confirm.vue';
 import QuickMark from '../components/QuickMark.vue';
@@ -64,7 +59,7 @@ const router = useRouter();
 
 const tableData = ref<TableDataCloumn[]>([]);
 const comment = ref<string>('');
-const colors = ref<string[]>(['#f56c56', '#409eff', '#FF9900']);
+const colors = ref<string[]>(['#909399', ' #da9733', '#FF9900']);
 const confirmRef = ref<InstanceType<typeof Confirm> | null>(null);
 const quickMarkRef = ref<InstanceType<typeof QuickMark> | null>(null);
 onMounted(() => {
@@ -106,7 +101,7 @@ const del = async (val: TableDataCloumn) => {
 };
 const confirm = async () => {
   let flag = false;
-  let neverShow = localStorage.getItem('neverShow') === 'true' ? true : false;
+  let neverShow: boolean = localStorage.getItem('neverShow') === 'true';
   for (let i = 0; i < tableData.value.length; i++) {
     let el = tableData.value[i];
     if (el.ability === 0 || el.homework === 0 || el.manifestation === 0) {
