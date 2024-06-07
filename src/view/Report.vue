@@ -83,7 +83,7 @@ const init = () => {
         { max: 36, name: '观察能力' },
         { max: 36, name: '识图能力' },
         { max: 36, name: '表达能力' },
-        { max: 36, name: '计算能力' },
+        { max: 5, name: '计算能力' },
         { max: 36, name: '推理能力' },
       ],
       startAngle: 22.5, // 设置雷达图旋转角度
@@ -97,7 +97,7 @@ const init = () => {
         type: 'radar',
         data: [
           {
-            value: [26, 22, 14, 27, 8, 16, 4, 34],
+            value: [26, 22, 14, 27, 8, 16, 5, 34],
             name: '',
             areaStyle: {
               color: '#f2deaa',

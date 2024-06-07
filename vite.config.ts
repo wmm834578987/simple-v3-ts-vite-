@@ -1,21 +1,10 @@
-/*
- * @Author: wmm834578987 53178191+wmm834578987@users.noreply.github.com
- * @Date: 2024-04-26 14:45:21
- * @LastEditors: 王明明834578987 10266004+wang-mingming-834578987@user.noreply.gitee.com
- * @LastEditTime: 2024-05-21 10:17:47
- * @FilePath: \imageManager\vite.config.ts
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
- */
+
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import Components from "unplugin-vue-components/vite"; // 按需组件自动导入
 import { AntDesignVueResolver } from "unplugin-vue-components/resolvers";
 import postcsspxtoviewport from "postcss-px-to-viewport"
 import AutoImport from 'unplugin-auto-import/vite'
-// https://vitejs.dev/config/
-
-
-// https://vitejs.dev/config/
 export default defineConfig({
 
   css: {
