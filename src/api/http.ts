@@ -13,8 +13,9 @@ import { Result } from "../assets/type/common";
 // 测试环境和生产环境互换
 const { MODE } = import.meta.env
 let env = MODE === 'production' ? "stukj-pro" : "stukj-test"
+console.log(MODE, 'MODE')
 const request = axios.create({
-    baseURL: `/api/${env}/preschool/` //import.meta.env.MODE === 'production' ? env : `/api/${env}`
+    baseURL: `${MODE == 'development' ? '/api' : ''}/${env}/preschool/` //import.meta.env.MODE === 'production' ? env : `/api/${env}`
 })
 
 // http request拦截器
