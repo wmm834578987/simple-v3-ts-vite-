@@ -86,12 +86,14 @@ const back = async () => {
 
   tableData.value.forEach((el: ListResult) => {
     tempResult.value.correctList.forEach((item: ListResult) => {
-      if (
-        el.homework != item.homework ||
-        el.manifestation != item.manifestation ||
-        el.ability != item.ability
-      ) {
-        flag = true;
+      if (el.id === item.id) {
+        if (
+          el.homework !== item.score1 ||
+          el.manifestation !== item.score2 ||
+          el.ability !== item.score3
+        ) {
+          flag = true;
+        }
       }
     });
   });

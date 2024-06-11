@@ -37,16 +37,17 @@
             :auto-upload="false"
             accept=".png,.jpg"
           >
-            <img
+            <el-image
               class="avatar"
               v-if="row.profilePic"
               :src="row.profilePic"
               @click="storeCurrent(row)"
               alt=""
               srcset=""
+              lazy
             />
 
-            <img
+            <el-image
               class="avatar"
               v-else
               :src="defaultImg"
@@ -125,7 +126,6 @@ const pageSize = ref<number>(10);
 const total = ref<number>(0);
 onMounted(() => {
   getPreschoolList();
-
   getTableData();
 });
 const row = ref<TableColumn>({
