@@ -56,8 +56,8 @@
       </el-table-column>
       <el-table-column prop="correct" label="批改成绩">
         <template #default="{ row }">
-          <el-button :type="row.has ? 'danger' : 'primary'" @click="correct(row)">
-            {{ row.has ? '已批改' : '批改' }}
+          <el-button :type="row.isCorrect ? 'danger' : 'primary'" @click="correct(row)">
+            {{ row.isCorrect ? '已批改' : '批改' }}
           </el-button>
         </template>
       </el-table-column>
@@ -128,7 +128,7 @@ const row = ref<TableColumn>({
   preschool: '',
   userName: '',
   profilePic: '',
-  has: false,
+  isCorrect: false,
   isCorrect: '',
   id: 0,
 });

@@ -42,6 +42,7 @@
       maxlength="300"
       show-word-limit
       :rows="6"
+      style="height: 20vh"
     ></el-input>
     <el-button class="confirm-btn" type="primary" @click="doConfirm">确认修改</el-button>
   </div>
@@ -199,6 +200,7 @@ const formatMark = (val: ListResult[]) => {
 }
 :deep(.el-textarea__inner) {
   font-size: 24px;
+  height: 18vh;
 }
 #correct {
   width: 100vw;
