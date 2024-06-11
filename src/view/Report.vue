@@ -73,12 +73,12 @@ onMounted(() => {
   console.log(route.query);
   getReport1();
   getReport2();
+  profilePic.value = route.query.profilePic as string;
 });
 
 const getReport1 = async () => {
   const res = (await report1({ userId: route.query.id as string })) as Result;
   if (res.code === '10000') {
-    profilePic.value = res.data.profilePic;
     total.value = res.data.reportList.length;
     reportList.value = res.data.reportList;
     reportList.value.forEach((el: ListResult, idx: number) => {
