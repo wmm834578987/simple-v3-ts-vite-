@@ -82,13 +82,30 @@ onMounted(() => {
 });
 
 const back = async () => {
-  // const res = await ElMessageBox.confirm('有未保存的数据，是否确认返回？', '提示', {
-  //   confirmButtonText: '确认',
-  //   cancelButtonText: '取消',
-  //   type: 'warning',
-  // });
-  // if (!res) return;
+  let flag = false;
 
+  tableData.value.forEach((el: ListResult) => {
+    tempResult.value.correctList.forEach((item: ListResult) => {
+      if (
+        el.homework != item.homework ||
+        el.manifestation != item.manifestation ||
+        el.ability != item.ability
+      ) {
+        flag = true;
+      }
+    });
+  });
+  if (tempResult.value.comments != comment.value) {
+    flag = true;
+  }
+  if (flag) {
+    const res = await ElMessageBox.confirm('有未保存的数据，是否确认返回？', '提示', {
+      confirmButtonText: '确认',
+      cancelButtonText: '取消',
+      type: 'warning',
+    });
+    if (!res) return;
+  }
   router.push('/');
 };
 
