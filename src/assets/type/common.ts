@@ -33,7 +33,6 @@ export interface TableColumn {
     userName: string;
     profilePic: string;
     index?: number;
-    has: string | number | boolean;
     isCorrect: number | string;
     id: number | string
 }

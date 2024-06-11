@@ -128,7 +128,6 @@ const row = ref<TableColumn>({
   preschool: '',
   userName: '',
   profilePic: '',
-  isCorrect: false,
   isCorrect: '',
   id: 0,
 });
