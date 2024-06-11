@@ -39,22 +39,18 @@
           >
             <el-image
               class="avatar"
-              v-if="row.profilePic"
               :src="row.profilePic"
               @click="storeCurrent(row)"
               alt=""
               srcset=""
               lazy
-            />
-
-            <el-image
-              class="avatar"
-              v-else
-              :src="defaultImg"
-              @click="storeCurrent(row)"
-              alt=""
-              srcset=""
-            />
+            >
+              <template #error>
+                <div class="image-slot">
+                  <img :src="defaultImg" class="avatar" alt="" srcset="" />
+                </div>
+              </template>
+            </el-image>
           </el-upload>
         </template>
       </el-table-column>

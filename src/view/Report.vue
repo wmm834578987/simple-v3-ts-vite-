@@ -236,6 +236,7 @@ const back = () => {
         box-shadow: none;
         border: 3px solid #f0c03d;
         background-color: #fff;
+        color: #000;
       }
     }
     .comment {
@@ -245,6 +246,7 @@ const back = () => {
         font-size: 18px;
         box-shadow: none;
         border: 3px solid #f0c03d;
+        color: #000;
       }
     }
     .username {
