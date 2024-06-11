@@ -1,3 +1,5 @@
+import { UploadRawFile } from "element-plus";
+
 /*
  * @Author: wmm834578987 53178191+wmm834578987@users.noreply.github.com
  * @Date: 2024-04-26 17:52:53
@@ -16,15 +18,24 @@ export interface Result<T = any> {
     data?: T;
 }
 export interface queryParam {
-    id: string | number
+    page?: number
+    limit?: number
+    preschool?: string
+    userName?: string
+    isCorrect?: string | number
+    userId?: string | number
+    file?: UploadRawFile
+    id?: number | string
 }
 
 export interface TableColumn {
-    kindergarten: string;
-    name: string;
-    avatar: string;
+    preschool: string;
+    userName: string;
+    profilePic: string;
     index?: number;
     has: string | number | boolean;
+    isCorrect: number | string;
+    id: number | string
 }
 
 export interface TableDataCloumn {
@@ -39,3 +50,31 @@ export enum MARK {
     manifestation = 'manifestation',
     ability = 'ability',
 }
+
+export interface ListResult {
+    id?: number;
+    createTime?: null | string;
+    updateTime?: string;
+    preschool: string;
+    userName?: string;
+    lectureName?: string;
+    score1?: number;
+    score2?: number;
+    score3?: number;
+    isDeleted?: number;
+    lecture?: string;
+    homework?: number;
+    manifestation?: number;
+    ability?: number;
+    point?: string;
+    errorPoint?: string;
+    index?: number
+}
+
+
+export interface RadarOption {
+    ability: string
+    userScore: number
+    totalScore: number
+}
+

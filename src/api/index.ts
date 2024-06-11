@@ -9,7 +9,15 @@
 import type { queryParam } from "../assets/type/common"
 import { get, post } from "./http";
 export default {
-    getPicTags: (param: queryParam) => get("getPicTags", param),
+    selectPreschoolList: (param: queryParam) => get("selectPreschoolList", param),
+    selectPreschoolUserList: (param: queryParam) => post("selectPreschoolUserList", param),
+    uploadProfilePic: (param: FormData) => post("uploadProfilePic", param),
+    selectCorrectScore: (param: queryParam) => get("selectCorrectScore", param),
+    correctScore: (param: queryParam) => post("correctScore", param),
+    deleteCorrectScore: (param: queryParam) => get("deleteCorrectScore", param),
+    report1: (param: queryParam) => get("report1", param),
+    report2: (param: queryParam) => get("report2", param),
+    outputReport: (param: queryParam) => get("outputReport", param),
 }
 
 

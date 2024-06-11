@@ -6,11 +6,11 @@
     <el-button type="primary" class="export-btn" @click="exportImg">导出所有图片</el-button>
     <div class="table-part" :id="`part${item + 1}`" v-for="item in getPages()" :key="item">
       <div class="profile-box">
-        <img src="../assets/img/sun.png" class="profile" alt="" />
+        <img :src="profilePic" class="profile" alt="" />
         <img class="decoration" src="../assets/img/decoration.png" />
         <div class="name-input">
-          <div class="name-input-item"><span>姓名</span> {{ route.query.name }}</div>
-          <div class="name-input-item"><span>幼儿园</span> {{ route.query.kindergarten }}</div>
+          <div class="name-input-item"><span>姓名</span> {{ route.query.userName }}</div>
+          <div class="name-input-item"><span>幼儿园</span> {{ route.query.preschool }}</div>
         </div>
       </div>
       <div class="name"></div>
@@ -18,6 +18,7 @@
         :index="item"
         :count="item == getPages() ? (total % 7 == 0 ? 7 : total % 7) : 7"
         class="table"
+        :tb-list="reportList"
       ></CommonTable>
     </div>
     <div id="part1">
@@ -26,11 +27,11 @@
       </div>
       <div id="charts"></div>
       <div class="profile-box avatar">
-        <img src="../assets/img/sun.png" class="profile" alt="" />
+        <img :src="profilePic" class="profile" alt="" />
         <img class="decoration" src="../assets/img/decoration.png" />
         <div class="name-input">
-          <div class="name-input-item"><span>姓名</span> {{ route.query.name }}</div>
-          <div class="name-input-item"><span>幼儿园</span> {{ route.query.kindergarten }}</div>
+          <div class="name-input-item"><span>姓名</span> {{ route.query.userName }}</div>
+          <div class="name-input-item"><span>幼儿园</span> {{ route.query.preschool }}</div>
         </div>
       </div>
       <div class="title-common child2">
@@ -54,20 +55,68 @@
 <script setup lang="ts">
 import * as echarts from 'echarts';
 import { toPng } from 'html-to-image';
+import { Result, ListResult, RadarOption } from '../assets/type/common';
 import { downloadImage } from '../assets/js/common';
 import CommonTable from '../components/CommonTable.vue';
 import { useRoute, useRouter } from 'vue-router';
+import api from '../api';
+import { ElMessage } from 'element-plus';
+const { report1, report2 } = api;
 const route = useRoute();
 const router = useRouter();
 const advice = ref<string>('');
 const comment = ref<string>('');
-const total = ref<number>(14);
+const profilePic = ref<string>('');
+const total = ref<number>(0);
+const reportList = ref<ListResult[]>([]);
 onMounted(() => {
   console.log(route.query);
-  init();
+  getReport1();
+  getReport2();
 });
 
-const init = () => {
+const getReport1 = async () => {
+  const res = (await report1({ userId: route.query.id as string })) as Result;
+  if (res.code === '10000') {
+    profilePic.value = res.data.profilePic;
+    total.value = res.data.reportList.length;
+    reportList.value = res.data.reportList;
+    reportList.value.forEach((el: ListResult, idx: number) => {
+      el.index = idx + 1;
+      el.lecture = el.lectureName;
+      el.homework = el.score1;
+      el.manifestation = el.score2;
+      el.ability = el.score3;
+    });
+  } else {
+    ElMessage.error(res.msg || '获取数据失败');
+  }
+};
+const getReport2 = async () => {
+  const res = (await report2({ userId: route.query.id as string })) as Result;
+  console.log(res, '========>res report2');
+  // init();
+  if (res.code === '10000') {
+    const { userScoreList } = res.data;
+    advice.value = res.data.advice;
+    comment.value = res.data.comments;
+    init(userScoreList);
+  } else {
+    ElMessage.error(res.msg || '获取数据失败');
+  }
+};
+
+const init = (userScoreList: RadarOption[]) => {
+  interface Indicator {
+    max: number;
+    name: string;
+  }
+  const indicator: Indicator[] = [];
+  const data: number[] = [];
+  userScoreList.forEach((el: RadarOption) => {
+    indicator.push({ name: el.ability, max: el.totalScore });
+    data.push(el.userScore);
+  });
   let myChart = echarts.init(document.getElementById('charts'));
   let option = {
     title: {
@@ -76,16 +125,7 @@ const init = () => {
 
     radar: {
       // shape: 'circle',
-      indicator: [
-        { max: 36, name: '专注力' },
-        { max: 36, name: '记忆力' },
-        { max: 36, name: '动手能力' },
-        { max: 36, name: '观察能力' },
-        { max: 36, name: '识图能力' },
-        { max: 36, name: '表达能力' },
-        { max: 5, name: '计算能力' },
-        { max: 36, name: '推理能力' },
-      ],
+      indicator: indicator,
       startAngle: 22.5, // 设置雷达图旋转角度
       name: {
         color: '#000', // 设置周围文字颜色为蓝色
@@ -97,7 +137,7 @@ const init = () => {
         type: 'radar',
         data: [
           {
-            value: [26, 22, 14, 27, 8, 16, 5, 34],
+            value: data,
             name: '',
             areaStyle: {
               color: '#f2deaa',
@@ -125,11 +165,11 @@ const exportImg = async () => {
   for (let i = 0; i < getPages() + 1; i++) {
     let el = document.querySelector(`#part${i + 1}`) as HTMLDivElement;
     const img = await toPng(el);
-    let { kindergarten, name } = route.query;
+    let { preschool, userName } = route.query;
     console.log(i, '====。i');
     downloadImage(
       img,
-      `${kindergarten as string}(${name})` + `_${i + 1}_${getPages() + 1}` + '.png'
+      `${preschool as string}(${userName})` + `_${i + 1}_${getPages() + 1}` + '.png'
     );
   }
 };
@@ -191,8 +231,8 @@ const back = () => {
       transform: translateX(-50%);
       top: 612px;
       :deep(.el-textarea__inner) {
-        height: 120px;
-        font-size: 24px;
+        height: 140px;
+        font-size: 18px;
         box-shadow: none;
         border: 3px solid #f0c03d;
         background-color: #fff;
@@ -202,7 +242,7 @@ const back = () => {
       top: 800px;
       :deep(.el-textarea__inner) {
         height: 210px;
-        font-size: 24px;
+        font-size: 18px;
         box-shadow: none;
         border: 3px solid #f0c03d;
       }

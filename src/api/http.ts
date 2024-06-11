@@ -12,9 +12,9 @@ import axios, {
 import { Result } from "../assets/type/common";
 // 测试环境和生产环境互换
 const { MODE } = import.meta.env
-let env = MODE === 'production' ? "newKejian-pro" : "newKejian-test"
+let env = MODE === 'production' ? "stukj-pro" : "stukj-test"
 const request = axios.create({
-    baseURL: `/${env}` //import.meta.env.MODE === 'production' ? env : `/api/${env}`
+    baseURL: `/api/${env}/preschool/` //import.meta.env.MODE === 'production' ? env : `/api/${env}`
 })
 
 // http request拦截器

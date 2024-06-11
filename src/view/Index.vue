@@ -2,25 +2,20 @@
   <div id="index">
     <el-form :inline="true" :model="form" class="demo-form-inline">
       <el-form-item label="幼儿园">
-        <el-select v-model="form.kindergarten" placeholder="请选择幼儿园">
-          <el-option
-            :label="item.key"
-            :value="item.value"
-            v-for="item in kindergartenList"
-            :key="item.value"
-          />
+        <el-select v-model="form.preschool" placeholder="请选择幼儿园" @change="getTableData">
+          <el-option :label="item" :value="item" v-for="item in kindergartenList" :key="item" />
         </el-select>
       </el-form-item>
 
       <el-form-item label="是否批改">
-        <el-select v-model="form.correct" placeholder="请选择是否批改">
-          <el-option label="全部" value="all" />
+        <el-select v-model="form.isCorrect" placeholder="请选择是否批改" @change="getTableData">
+          <el-option label="全部" value="全部" />
           <el-option label="已批改" value="1" />
           <el-option label="未批改" value="0" />
         </el-select>
       </el-form-item>
       <el-form-item label="姓名">
-        <el-input v-model="form.name" placeholder="请输入姓名" />
+        <el-input v-model="form.userName" placeholder="请输入姓名" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="onSubmit">搜索</el-button>
@@ -29,9 +24,9 @@
 
     <el-table :data="tableData" border style="width: 100%">
       <el-table-column prop="index" label="序号" width="100" />
-      <el-table-column prop="kindergarten" label="幼儿园" width="300" />
-      <el-table-column prop="name" label="姓名" width="150" />
-      <el-table-column prop="avatar" label="头像" width="200">
+      <el-table-column prop="preschool" label="幼儿园" width="300" />
+      <el-table-column prop="userName" label="姓名" width="150" />
+      <el-table-column prop="profilePic" label="头像" width="200">
         <template #default="{ row }">
           <el-upload
             v-model:file-list="fileList"
@@ -44,8 +39,8 @@
           >
             <img
               class="avatar"
-              v-if="row.avatar"
-              :src="row.avatar"
+              v-if="row.profilePic"
+              :src="row.profilePic"
               @click="storeCurrent(row)"
               alt=""
               srcset=""
@@ -116,34 +111,35 @@ import { ElMessage } from 'element-plus';
 import VuePictureCropper, { cropper } from 'vue-picture-cropper';
 import { getImageUrl, getFileExtension } from '../assets/js/common';
 import { LocationQueryRaw, useRouter } from 'vue-router';
-import { TableColumn } from '../assets/type/common';
+import { TableColumn, Result } from '../assets/type/common';
+import api from '../api';
+const { selectPreschoolList, selectPreschoolUserList, uploadProfilePic } = api;
 const router = useRouter();
 const fileList = ref<UploadUserFile[]>([]);
 const currentFile = ref<UploadUserFile>();
 const dialogVisible = ref<boolean>(false);
-const kindergartenList = ref([
-  { key: '全部', value: 'all' },
-  { key: '学田', value: '1' },
-  { key: '学士府', value: '2' },
-  { key: '龚路', value: '3' },
-]);
+const kindergartenList = ref<string[]>([]);
 const tableData = ref<TableColumn[]>([]);
 const pageNum = ref<number>(1);
 const pageSize = ref<number>(10);
 const total = ref<number>(0);
 onMounted(() => {
+  getPreschoolList();
+
   getTableData();
 });
 const row = ref<TableColumn>({
-  kindergarten: '',
-  name: '',
-  avatar: '',
+  preschool: '',
+  userName: '',
+  profilePic: '',
   has: false,
+  isCorrect: '',
+  id: 0,
 });
 const form = ref({
-  kindergarten: 'all',
-  name: '',
-  correct: 'all',
+  preschool: '全部',
+  userName: '',
+  isCorrect: '全部',
 });
 
 const defaultImg = ref<string>(getImageUrl('transparent.png'));
@@ -151,11 +147,11 @@ const updatedImg = ref<string>('');
 
 const fileChange: UploadProps['onChange'] = (file: UploadFile) => {
   const { size, name } = file;
-  if (size && size > 3 * 1024 * 1024) {
-    return ElMessage.error('图片不能超过3M');
-  }
   if (getFileExtension(name) !== 'png' && getFileExtension(name) !== 'jpg') {
     return ElMessage.error('图片格式不正确，请上传PNG或者JPG格式图片');
+  }
+  if (size && size > 3 * 1024 * 1024) {
+    return ElMessage.error('图片不能超过3M');
   }
   currentFile.value = file;
   const reader = new FileReader();
@@ -174,41 +170,63 @@ const storeCurrent = (current: TableColumn) => {
   console.log(current, 'current');
   row.value = current;
 };
-const uploadFile = (file: UploadRawFile) => {
-  console.log(file);
+const uploadFile = async (file: UploadRawFile) => {
+  let formData = new FormData();
+  formData.append('file', file);
+  formData.append('userId', row.value.id + '');
+  const res = (await uploadProfilePic(formData)) as Result;
+  console.log(res, 'res');
+  if (res.code === '10000') {
+    getTableData();
+    dialogVisible.value = false;
+  } else {
+    ElMessage.error('上传图象失败');
+  }
 };
 const getCroppedImage = async () => {
   if (!cropper) return;
-  const base64 = cropper.getDataURL();
-  const blob: Blob | null = await cropper.getBlob();
-  if (!blob) return;
   const file = (await cropper.getFile({
     fileName: currentFile.value?.name,
   })) as UploadRawFile;
+  console.log(file, 'file');
   uploadFile(file);
-  row.value.avatar = base64;
-  dialogVisible.value = false;
-  //   console.log({ base64, blob, file });
 };
 const onSubmit = () => {
   getTableData();
 };
 
-const getTableData = async () => {
-  tableData.value = [];
-  let param = { ...form.value, pageNum: pageNum.value, pageSize: pageSize.value };
-  console.log(param);
-  for (let index = 0; index < 10; index++) {
-    let obj = {
-      kindergarten: '学田幼儿园',
-      name: 'ber ber',
-      avatar: '',
-      index: (pageNum.value - 1) * pageSize.value + index + 1,
-      has: index % 2 == 0,
-    };
-    tableData.value.push(obj);
+const getPreschoolList = async () => {
+  const res = (await selectPreschoolList({})) as Result;
+  console.log(res, '====>res');
+  if (res.code === '10000') {
+    kindergartenList.value = res.data;
+    kindergartenList.value.unshift('全部');
+  } else {
+    ElMessage.error('获取幼儿园信息失败');
   }
-  total.value = 134;
+};
+
+const getTableData = async () => {
+  const { isCorrect, preschool, userName } = form.value;
+  let param = {
+    userName,
+    isCorrect: isCorrect === '全部' ? '' : isCorrect,
+    preschool: preschool === '全部' ? '' : preschool,
+    page: pageNum.value,
+    limit: pageSize.value,
+  };
+  const res = (await selectPreschoolUserList(param)) as Result;
+  console.log(res);
+  if (res.code === '10000') {
+    tableData.value = res.data.data;
+    tableData.value.forEach((el, index) => {
+      el.index = (pageNum.value - 1) * pageSize.value + index + 1;
+      el.profilePic = el.profilePic + '?' + 'cb=' + Math.random();
+    });
+    total.value = res.data.count;
+  } else {
+    ElMessage.error('获取数据失败');
+  }
 };
 
 const pageNumChange = (val: number) => {

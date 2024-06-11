@@ -4,11 +4,11 @@
       <div class="back _primary" @click="back">
         <el-icon><Back /></el-icon>
       </div>
-      <div class="kindergarten relative">{{ route.query.kindergarten }}</div>
-      <div class="name relative">{{ route.query.name }}</div>
+      <div class="kindergarten relative">{{ route.query.preschool }}</div>
+      <div class="name relative">{{ route.query.userName }}</div>
       <div class="add-btn absolute">
         <el-button type="success" @click="doQuickMark">快速打分</el-button>
-        <el-button type="primary">新增讲次</el-button>
+        <!-- <el-button type="primary">新增讲次</el-button> -->
       </div>
     </header>
     <el-table :data="tableData" border style="width: 100%">
@@ -43,7 +43,7 @@
       show-word-limit
       :rows="6"
     ></el-input>
-    <el-button class="confirm-btn" type="primary" @click="confirm">确认修改</el-button>
+    <el-button class="confirm-btn" type="primary" @click="doConfirm">确认修改</el-button>
   </div>
   <Confirm ref="confirmRef" @confirm="doSubmit"></Confirm>
   <QuickMark ref="quickMarkRef" @formatMark="formatMark" :tableData="tableData"></QuickMark>
@@ -53,15 +53,30 @@
 import { ElMessage, ElMessageBox } from 'element-plus';
 import Confirm from '../components/Confirm.vue';
 import QuickMark from '../components/QuickMark.vue';
-import type { TableDataCloumn } from '../assets/type/common';
+import type { Result, ListResult } from '../assets/type/common';
 const route = useRoute();
 const router = useRouter();
-
-const tableData = ref<TableDataCloumn[]>([]);
+import api from '../api';
+const { selectCorrectScore, deleteCorrectScore, correctScore } = api;
+const tableData = ref<ListResult[]>([]);
 const comment = ref<string>('');
 const colors = ref<string[]>(['#909399', ' #da9733', '#FF9900']);
 const confirmRef = ref<InstanceType<typeof Confirm> | null>(null);
 const quickMarkRef = ref<InstanceType<typeof QuickMark> | null>(null);
+export interface TempResult {
+  correctList: ListResult[];
+  comments: string;
+  userId: number;
+  preschool: string;
+  userName: string;
+}
+const tempResult = ref<TempResult>({
+  correctList: [],
+  comments: '',
+  userId: 0,
+  preschool: '',
+  userName: '',
+});
 onMounted(() => {
   getTableData();
 });
@@ -77,29 +92,40 @@ const back = async () => {
   router.push('/');
 };
 
-const getTableData = () => {
-  for (let index = 0; index < 14; index++) {
-    tableData.value.push({
-      lecture: '第一讲',
-      homework: 0,
-      manifestation: 0,
-      ability: 0,
+const getTableData = async () => {
+  const res = (await selectCorrectScore({ userId: route.query.id as string })) as Result;
+  console.log(res, 'res');
+  if (res.code === '10000') {
+    res.data.correctList.forEach((el: ListResult) => {
+      el.lecture = el.lectureName;
+      el.homework = el.score1;
+      el.manifestation = el.score2;
+      el.ability = el.score3;
     });
+    tableData.value = res.data.correctList;
+    tempResult.value = res.data;
+    comment.value = res.data.comments;
+  } else {
+    ElMessage.error('获取信息失败');
   }
 };
-const del = async (val: TableDataCloumn) => {
+const del = async (val: ListResult) => {
   console.log(val, '===>val');
-  const res = await ElMessageBox.confirm('删除后不可恢复，请谨慎操作！', '是否删除', {
+  const result = await ElMessageBox.confirm('删除后不可恢复，请谨慎操作！', '是否删除', {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
     type: 'warning',
   });
-  if (!res) return;
-  ElMessage.success('删除成功');
-  // const data =await
-  getTableData();
+  if (!result) return;
+  const res = (await deleteCorrectScore({ id: route.query.id as string })) as Result;
+  if (res.code === '10000') {
+    ElMessage.success('删除成功');
+    getTableData();
+  } else {
+    ElMessage.error(res.msg || '删除失败');
+  }
 };
-const confirm = async () => {
+const doConfirm = async () => {
   let flag = false;
   let neverShow: boolean = localStorage.getItem('neverShow') === 'true';
   for (let i = 0; i < tableData.value.length; i++) {
@@ -113,17 +139,36 @@ const confirm = async () => {
     confirmRef.value?.show();
     return;
   }
+  if (comment.value.trim() == '') {
+    return ElMessage.warning('老师评语不能为空');
+  }
   doSubmit();
 };
-const doSubmit = () => {
+const doSubmit = async () => {
+  tempResult.value.correctList = tableData.value;
+  tempResult.value.comments = comment.value;
+  console.log(tempResult.value.correctList, 'tempResult.value.correctList');
   console.log('submit is invoke');
-  router.push('/');
+  tempResult.value.correctList.forEach((el: ListResult) => {
+    el.score1 = el.homework;
+    el.score2 = el.manifestation;
+    el.score3 = el.ability;
+  });
+
+  const res = (await correctScore(tempResult.value)) as Result;
+  console.log(res, '====>res');
+  if (res.code === '10000') {
+    ElMessage.success('修改成功');
+    router.push('/');
+  } else {
+    ElMessage.error(res.msg || '修改失败');
+  }
 };
 const doQuickMark = () => {
   quickMarkRef.value?.show();
 };
 
-const formatMark = (val: TableDataCloumn[]) => {
+const formatMark = (val: ListResult[]) => {
   tableData.value = val;
 };
 </script>

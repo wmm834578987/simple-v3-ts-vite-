@@ -5,17 +5,17 @@ const routes = [
     {
         path: '/',
         name: 'index',
-        component: () => import('../view/Index.vue'), // 懒加载组件
+        component: () => import('../view/Index.vue'),
     },
     {
         path: '/report',
         name: 'report',
-        component: () => import('../view/Report.vue'), // 懒加载组件
+        component: () => import('../view/Report.vue'),
     },
     {
         path: '/correct',
         name: 'correct',
-        component: () => import('../view/Correct.vue'), // 懒加载组件
+        component: () => import('../view/Correct.vue'),
     }
 ]
 const router = createRouter({

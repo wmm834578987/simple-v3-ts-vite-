@@ -5,17 +5,18 @@
     </div>
     <div class="tb" v-for="item in tbList" :key="item.index">
       <div class="tr">第{{ item.index }}讲</div>
-      <div class="tr">
-        <div class="context">{{ item.context }}</div>
+      <div class="tr to-left">
+        <div class="context"><span>知识点:</span> {{ item.point }}</div>
+        <div class="context"><span>易错点:</span> {{ item.errorPoint }}</div>
       </div>
       <div class="tr">
-        <img :src="el" alt="" v-for="el in getRate(item.rate1, 'pen')" :key="el" />
+        <img :src="el" alt="" v-for="el in getRate(item.score1, 'pen')" :key="el" />
       </div>
       <div class="tr">
-        <img :src="el" alt="" v-for="el in getRate(item.rate2, 'flower')" :key="el" />
+        <img :src="el" alt="" v-for="el in getRate(item.score2, 'flower')" :key="el" />
       </div>
       <div class="tr">
-        <img :src="el" alt="" v-for="el in getRate(item.rate3, 'sun')" :key="el" />
+        <img :src="el" alt="" v-for="el in getRate(item.score3, 'sun')" :key="el" />
       </div>
     </div>
   </div>
@@ -23,27 +24,11 @@
 
 <script setup lang="ts">
 import { getImageUrl } from '../assets/js/common';
-const props = defineProps(['index', 'count']);
+const props = defineProps(['index', 'count', 'tbList']);
 console.log(props);
-interface TbList {
-  index?: number;
-  context?: string;
-  rate1: number;
-  rate2: number;
-  rate3: number;
-}
+
 const thList = ref<string[]>(['讲次', '知识点与易错点', '作业完成', '平时表现', '能力检测']);
-const tbList = ref<TbList[]>([]);
-for (let i = 0; i < props.count; i++) {
-  tbList.value.push({
-    index: (props.index - 1) * 7 + i + 1,
-    context:
-      '知识点：量时头对齐，再看数，遇到断尺数格子使用格子尺测量物品 \n易错点：相近干扰选项需满足多个条件时，只考虑一个角度',
-    rate1: Math.floor(Math.random() * 7),
-    rate2: Math.floor(Math.random() * 7),
-    rate3: Math.floor(Math.random() * 7),
-  });
-}
+
 const getRate = (r: number, type: string): string[] => {
   const list = '000000111111'.slice(6 - r, 12 - r);
   let arr = [];
@@ -110,5 +95,16 @@ img {
   white-space: pre-line;
   word-break: break-all;
   font-size: 14px;
+  span {
+    margin-right: 5px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #777;
+  }
+}
+
+.to-left {
+  justify-content: left !important;
+  padding-left: 10px !important;
 }
 </style>
