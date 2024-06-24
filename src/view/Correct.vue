@@ -2,7 +2,9 @@
   <div id="correct">
     <header>
       <div class="back _primary" @click="back">
-        <el-icon><Back /></el-icon>
+        <el-icon>
+          <Back />
+        </el-icon>
       </div>
       <div class="kindergarten relative">{{ route.query.preschool }}</div>
       <div class="name relative">{{ route.query.userName }}</div>
@@ -35,16 +37,9 @@
       </el-table-column>
     </el-table>
     <div class="title">老师评语</div>
-    <el-input
-      type="textarea"
-      v-model="comment"
-      resize="none"
-      maxlength="300"
-      show-word-limit
-      :rows="6"
-      style="height: 20vh"
-    ></el-input>
-    <el-button class="confirm-btn" type="primary" @click="doConfirm">确认修改</el-button>
+    <el-input type="textarea" v-model="comment" resize="none" maxlength="220" show-word-limit :rows="6"
+      style="height: 20vh"></el-input>
+    <el-button class="confirm-btn" type="primary" @click="doConfirm">提交</el-button>
   </div>
   <Confirm ref="confirmRef" @confirm="doSubmit"></Confirm>
   <QuickMark ref="quickMarkRef" @formatMark="formatMark" :tableData="tableData"></QuickMark>
@@ -84,7 +79,6 @@ onMounted(() => {
 
 const back = async () => {
   let flag = false;
-
   tableData.value.forEach((el: ListResult) => {
     tempResult.value.correctList.forEach((item: ListResult) => {
       if (el.id === item.id) {
@@ -102,14 +96,29 @@ const back = async () => {
     flag = true;
   }
   if (flag) {
-    const res = await ElMessageBox.confirm('有未保存的数据，是否确认返回？', '提示', {
-      confirmButtonText: '确认',
-      cancelButtonText: '取消',
-      type: 'warning',
-    });
-    if (!res) return;
+    try {
+      await ElMessageBox.confirm('请确认已提交保存？', '提示', {
+        confirmButtonText: '保存',
+        cancelButtonText: '不保存',
+        type: 'warning',
+        center: true,
+        showClose: false
+      });
+      // 执行保存的相关操作 
+      doSubmit()
+    } catch (error) {
+      console.log(error)
+      if (error === 'cancel') {
+        // 用户点击了“取消”按钮或关闭了对话框，执行相应的操作  
+        router.push('/');
+      } else {
+        // 处理其他类型的错误  
+        console.error('发生错误:', error);
+      }
+    }
+  } else {
+    router.push('/');
   }
-  router.push('/');
 };
 
 const getTableData = async () => {
@@ -130,14 +139,15 @@ const getTableData = async () => {
   }
 };
 const del = async (val: ListResult) => {
-  console.log(val, '===>val');
+  console.log(val.id, '===>val');
   const result = await ElMessageBox.confirm('删除后不可恢复，请谨慎操作！', '是否删除', {
     confirmButtonText: '确认',
     cancelButtonText: '取消',
     type: 'warning',
   });
   if (!result) return;
-  const res = (await deleteCorrectScore({ id: route.query.id as string })) as Result;
+  console.log()
+  const res = (await deleteCorrectScore({ id: val.id })) as Result;
   if (res.code === '10000') {
     ElMessage.success('删除成功');
     getTableData();
@@ -159,7 +169,8 @@ const doConfirm = async () => {
     confirmRef.value?.show();
     return;
   }
-  if (comment.value.trim() == '') {
+  //const textL = comment.value.length
+  if (!comment.value || /^\s*$/.test(comment.value)) {
     return ElMessage.warning('老师评语不能为空');
   }
   doSubmit();
@@ -178,8 +189,21 @@ const doSubmit = async () => {
   const res = (await correctScore(tempResult.value)) as Result;
   console.log(res, '====>res');
   if (res.code === '10000') {
-    ElMessage.success('修改成功');
-    router.push('/');
+    try {
+      // 显示成功消息  
+      ElMessage.success('修改成功');
+
+      // 等待一段时间（可选），以便用户可以看到消息  
+      await new Promise(resolve => setTimeout(resolve, 2000)); // 等待2秒  
+
+      // 执行路由跳转  
+      router.push('/');
+    } catch (error) {
+      // 处理错误...  
+      console.error('修改失败:', error);
+      // 可以选择性地显示一个错误消息  
+      ElMessage.error('修改失败，请重试！');
+    }
   } else {
     ElMessage.error(res.msg || '修改失败');
   }
@@ -198,45 +222,55 @@ const formatMark = (val: ListResult[]) => {
   height: 55vh;
   overflow: auto;
 }
+
 :deep(.el-textarea__inner) {
   font-size: 24px;
   height: 18vh;
 }
+
 #correct {
-  width: 100vw;
+  width: 80vw;
   height: 100vh;
   padding: 2% 10%;
-  box-sizing: border-box;
+  margin: 0 auto;
+  background: #fff;
+
   header {
     width: 100%;
     height: 50px;
     display: flex;
     align-items: center;
     position: relative;
+
     .back {
       cursor: pointer;
       font-size: 24px;
     }
+
     .kindergarten {
       left: 100px;
       font-size: 26px;
       font-weight: 700;
     }
+
     .name {
       font-size: 22px;
       left: 150px;
       font-weight: 500;
     }
+
     .add-btn {
       right: 20px;
     }
   }
+
   .title {
     font-size: 20px;
     font-weight: 700;
     margin: 30px 0 10px 0;
   }
 }
+
 .confirm-btn {
   position: absolute;
   left: 50%;

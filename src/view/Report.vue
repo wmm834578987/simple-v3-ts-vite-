@@ -1,25 +1,23 @@
 <template>
   <div id="index">
     <div class="back _primary" @click="back">
-      <el-icon><Back /></el-icon>
+      <el-icon>
+        <Back />
+      </el-icon>
     </div>
     <el-button type="primary" class="export-btn" @click="exportImg">导出所有图片</el-button>
-    <div class="table-part" :id="`part${item + 1}`" v-for="item in getPages()" :key="item">
+    <div class="table-part" :id="`part${item + 1}`" v-for="(item, index) in getPages()" :key="item">
       <div class="profile-box">
         <img :src="profilePic" class="profile" alt="" />
         <img class="decoration" src="../assets/img/decoration.png" />
         <div class="name-input">
-          <div class="name-input-item"><span>姓名</span> {{ route.query.userName }}</div>
-          <div class="name-input-item"><span>幼儿园</span> {{ route.query.preschool }}</div>
+          <div class="name-input-item"><span>姓名:</span>{{ route.query.userName }}</div>
+          <div class="name-input-item"><span>幼儿园:</span>{{ route.query.preschool }}</div>
         </div>
       </div>
       <div class="name"></div>
-      <CommonTable
-        :index="item"
-        :count="item == getPages() ? (total % 7 == 0 ? 7 : total % 7) : 7"
-        class="table"
-        :tb-list="reportList"
-      ></CommonTable>
+      <CommonTable :index="item" :count="item == getPages() ? (total % 7 == 0 ? 7 : total % 7) : 7" class="table"
+        :tb-list="reportList.slice(index * 7, index * 7 + 7)"></CommonTable>
     </div>
     <div id="part1">
       <div class="title-common">
@@ -30,8 +28,8 @@
         <img :src="profilePic" class="profile" alt="" />
         <img class="decoration" src="../assets/img/decoration.png" />
         <div class="name-input">
-          <div class="name-input-item"><span>姓名</span> {{ route.query.userName }}</div>
-          <div class="name-input-item"><span>幼儿园</span> {{ route.query.preschool }}</div>
+          <div class="name-input-item"><span>姓名:</span> {{ route.query.userName }}</div>
+          <div class="name-input-item"><span>幼儿园:</span> {{ route.query.preschool }}</div>
         </div>
       </div>
       <div class="title-common child2">
@@ -41,13 +39,7 @@
       <div class="title-common child3">
         <img src="../assets/img/comment.png" alt="" srcset="" />
       </div>
-      <el-input
-        type="textarea"
-        class="advice comment"
-        resize="none"
-        disabled
-        v-model="comment"
-      ></el-input>
+      <el-input type="textarea" class="advice comment" resize="none" disabled v-model="comment"></el-input>
     </div>
   </div>
 </template>
@@ -117,7 +109,8 @@ const init = (userScoreList: RadarOption[]) => {
     indicator.push({ name: el.ability, max: el.totalScore });
     data.push(el.userScore);
   });
-  let myChart = echarts.init(document.getElementById('charts'));
+  //devicePixelRatio: 2.5
+  let myChart = echarts.init(document.getElementById('charts'), null, { renderer: "svg" });
   let option = {
     title: {
       text: '',
@@ -164,7 +157,17 @@ const getPages = (): number => {
 const exportImg = async () => {
   for (let i = 0; i < getPages() + 1; i++) {
     let el = document.querySelector(`#part${i + 1}`) as HTMLDivElement;
-    const img = await toPng(el);
+    const img = await toPng(el, {
+      quality: 1, // 0.95 是一个比较高的值，可以根据需要调
+      width: el.offsetWidth * 5, // 输出图像的宽度
+      height: el.offsetHeight * 5, // 输出图像的高度
+      style: {
+        transform: 'scale(5)', // 放大两倍，提高清晰度
+        transformOrigin: 'top left', // 确保放大不改变位置
+        width: `${el.offsetWidth}px`, // 确保元素宽度正确
+        height: `${el.offsetHeight}px` // 确保元素高度正确
+      }
+    });
     let { preschool, userName } = route.query;
     console.log(i, '====。i');
     downloadImage(
@@ -183,12 +186,17 @@ const back = () => {
   width: 32px;
   height: 32px;
 }
+
 #index {
-  width: 100vw;
+  width: 80vw;
   overflow: auto;
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin: 0 auto;
+  background: #fff;
+  padding: 2% 00;
+
   #part1 {
     width: 770px;
     height: 1080px;
@@ -196,6 +204,7 @@ const back = () => {
     background-size: 100% 100%;
     margin-bottom: 10px;
     position: relative;
+
     #charts {
       width: 600px;
       height: 400px;
@@ -204,20 +213,25 @@ const back = () => {
       left: 50%;
       transform: translate(-50%, -50%);
     }
+
     .title-common {
       position: absolute;
       left: 70px;
       top: 200px;
+
       img {
         height: 30px;
       }
     }
+
     .child2 {
       top: 570px;
     }
+
     .child3 {
       top: 760px;
     }
+
     .avatar {
       left: 9%;
       top: 8%;
@@ -230,6 +244,7 @@ const back = () => {
       left: 50%;
       transform: translateX(-50%);
       top: 612px;
+
       :deep(.el-textarea__inner) {
         height: 140px;
         font-size: 18px;
@@ -239,8 +254,10 @@ const back = () => {
         color: #000;
       }
     }
+
     .comment {
       top: 800px;
+
       :deep(.el-textarea__inner) {
         height: 210px;
         font-size: 18px;
@@ -249,10 +266,12 @@ const back = () => {
         color: #000;
       }
     }
+
     .username {
       top: 113px;
       width: 70%;
       left: 52%;
+
       :deep(.el-input__wrapper) {
         height: 60px;
         font-size: 24px;
@@ -264,10 +283,12 @@ const back = () => {
       }
     }
   }
+
   .profile-box {
     position: relative;
     z-index: 5;
     left: 10px;
+
     .profile {
       position: absolute;
       z-index: 9;
@@ -276,10 +297,12 @@ const back = () => {
       border-radius: 50%;
       background: yellow;
     }
+
     .decoration {
       position: absolute;
       z-index: 10;
     }
+
     .name-input {
       position: absolute;
       width: 500px;
@@ -295,16 +318,19 @@ const back = () => {
       border-radius: 10px;
       padding-left: 50px;
       display: flex;
+
       .name-input-item {
         margin-right: 40px;
+
         span {
           font-size: 20px;
-          color: #bbb;
+          //color: #bbb;
           margin-right: 10px;
         }
       }
     }
   }
+
   .table-part {
     width: 770px;
     height: 1080px;
@@ -322,6 +348,7 @@ const back = () => {
     margin-top: 15%;
   }
 }
+
 .export-btn {
   position: fixed;
   right: 20%;

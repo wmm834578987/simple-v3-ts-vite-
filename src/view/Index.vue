@@ -28,26 +28,12 @@
       <el-table-column prop="userName" label="姓名" width="150" />
       <el-table-column prop="profilePic" label="头像" width="200">
         <template #default="{ row }">
-          <el-upload
-            v-model:file-list="fileList"
-            class="upload-demo"
-            :show-file-list="false"
-            action="#"
-            :on-change="fileChange"
-            :auto-upload="false"
-            accept=".png,.jpg"
-          >
-            <el-image
-              class="avatar"
-              :src="row.profilePic"
-              @click="storeCurrent(row)"
-              alt=""
-              srcset=""
-              lazy
-            >
+          <el-upload v-model:file-list="fileList" class="upload-demo" :show-file-list="false" action="#"
+            :on-change="fileChange" :auto-upload="false" accept=".png,.jpg">
+            <el-image class="avatar" :src="row.profilePic" @click="storeCurrent(row)" alt="" srcset="" lazy>
               <template #error>
                 <div class="image-slot">
-                  <img :src="defaultImg" class="avatar" alt="" srcset="" />
+                  <img :src="defaultImg" class="avatar" alt="" srcset="" @click="storeCurrent(row)" />
                 </div>
               </template>
             </el-image>
@@ -67,31 +53,22 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-pagination
-      v-model:current-page="pageNum"
-      :page-size="pageSize"
-      layout="total, prev, pager, next,jumper"
-      :total="total"
-      @current-change="pageNumChange"
-      small
-      class="pagination"
-    />
+    <div class="pagination">
+      <el-pagination v-model:current-page="pageNum" :page-size="pageSize" layout="total, prev, pager, next,jumper"
+        :total="total" @current-change="pageNumChange" small />
+    </div>
+
     <el-dialog v-model="dialogVisible" title="图象裁剪" width="50%" top="5vh">
-      <VuePictureCropper
-        :boxStyle="{
-          width: '100%',
-          height: '100%',
-          backgroundColor: '#f8f8f8',
-          margin: 'auto',
-        }"
-        :img="updatedImg"
-        :options="{
-          viewMode: 1,
-          dragMode: 'crop',
-          aspectRatio: 10 / 10,
-        }"
-        style="height: 80vh"
-      ></VuePictureCropper>
+      <VuePictureCropper :boxStyle="{
+        width: '100%',
+        height: '100%',
+        backgroundColor: '#f8f8f8',
+        margin: 'auto',
+      }" :img="updatedImg" :options="{
+  viewMode: 1,
+  dragMode: 'crop',
+  aspectRatio: 10 / 10,
+}" style="height: 80vh"></VuePictureCropper>
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="dialogVisible = false">取消</el-button>
@@ -169,6 +146,7 @@ const uploadFile = async (file: UploadRawFile) => {
   let formData = new FormData();
   formData.append('file', file);
   formData.append('userId', row.value.id + '');
+  console.log(row.value.id, 'res');
   const res = (await uploadProfilePic(formData)) as Result;
   console.log(res, 'res');
   if (res.code === '10000') {
@@ -253,23 +231,29 @@ const preview = (val: TableColumn) => {
   height: 85vh;
   overflow: auto;
 }
+
 :deep(.el-form) {
   display: flex;
   justify-content: flex-end;
 }
+
 #index {
-  width: 100vw;
+  width: 80vw;
   height: 100vh;
-  padding: 2% 10%;
-  box-sizing: border-box;
+  padding: 2% 5%;
+  //box-sizing: border-box;
+  margin: 0 auto;
+  background: #fff;
+
   .avatar {
     width: 80px;
     height: 80px;
   }
+
   .pagination {
-    position: fixed;
-    right: 10%;
-    bottom: 20px;
+    display: flex;
+    justify-content: end;
+    margin-top: 15px;
   }
 }
 </style>

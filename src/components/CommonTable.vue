@@ -4,7 +4,9 @@
       <div class="tr" v-for="item in thList" :key="item">{{ item }}</div>
     </div>
     <div class="tb" v-for="item in tbList" :key="item.index">
-      <div class="tr">第{{ item.index }}讲</div>
+      <div class="tr">
+        <div class="context">第{{ item.index }}讲</div>
+      </div>
       <div class="tr to-left">
         <div class="context"><span>知识点:</span> {{ item.point }}</div>
         <div class="context"><span>易错点:</span> {{ item.errorPoint }}</div>
@@ -43,6 +45,7 @@ const getRate = (r: number, type: string): string[] => {
 <style lang="less" scoped>
 .my-table {
   width: 100%;
+
   .th {
     display: flex;
     height: 44px;
@@ -53,6 +56,7 @@ const getRate = (r: number, type: string): string[] => {
     font-size: 20px;
     font-weight: 700;
   }
+
   .tr {
     text-align: center;
     border-right: 1px solid #fff;
@@ -64,13 +68,16 @@ const getRate = (r: number, type: string): string[] => {
     justify-content: center;
     align-items: center;
     align-content: center;
+
     &:nth-child(1) {
       flex: 0.5;
     }
+
     &:nth-child(2) {
       flex: 2.5;
     }
   }
+
   .tb {
     // display: grid;
     // grid-template-columns: 1fr 2fr 1fr 1fr 1fr;
@@ -79,27 +86,32 @@ const getRate = (r: number, type: string): string[] => {
     line-height: 100px;
     background: #f9f3d3;
     border-bottom: 1px solid #fff;
+
     &:last-child {
       border-radius: 0 0 20px 20px;
     }
   }
 }
+
 img {
   width: 30px;
   height: 30px;
   margin: 3px 0;
 }
+
 .context {
   line-height: 25px;
   text-align: left;
   white-space: pre-line;
   word-break: break-all;
   font-size: 14px;
+  color: #665833;
+
   span {
     margin-right: 5px;
     font-size: 14px;
     font-weight: 700;
-    color: #777;
+    color: #665833;
   }
 }
 
